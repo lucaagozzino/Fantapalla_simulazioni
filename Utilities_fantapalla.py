@@ -195,10 +195,13 @@ def voti_max(rose, struttura_rosa, formazioni, dict_voti_giornata, teams,  num_s
             idx_all = np.hstack((idx_p,idx_d,idx_c,idx_a))
             
             extra = 0
-            if n_d >=4 and (voti_rosa[idx_d,k]>=6).sum()>=4:
-                extra = modificatore(voti_rosa[idx_d,k], valori, fasce)
-                #print(extra)
+            l_temp = copy.deepcopy(voti_rosa[idx_d,k].tolist())
+            l_temp = np.sort(l_temp)
             
+            if n_d >=4 and (l_temp >= 6).sum()>=4:
+                voti_mod = np.append(l_temp[-3:],voti_rosa[idx_p,k])
+                extra = modificatore(voti_mod, valori, fasce)
+               
             voto = max(voto,np.sum(voti_rosa[idx_all,k]) + extra)
             
         voti[teams[k+1]] = voto
@@ -303,7 +306,7 @@ def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_s
         punti = pd.DataFrame.from_dict(points(fixtures, voti_squadre, fasce_goal),orient='index')
         all_points = pd.concat([all_points,punti],axis=1)
         #print(voti_squadre)
-    total = pd.DataFrame(data= np.sum(np.array(all_points),axis=1,keepdims=True),  index=team_names, columns =['tot'])
+    total = pd.DataFrame(data= np.sum(np.array(all_points),axis=1,keepdims = True),  index=team_names, columns =['tot'])
     rose_id=rose
     rose = pd.DataFrame(data=rose, columns = team_names)
     rose_nomi = id_toName(struttura_rosa, quotazioni, rose, num_squadre, team_names)
