@@ -16,11 +16,11 @@ quotazioni = pd.read_csv ('Quotazioni_Fantacalcio.csv')
 
 # In[368]:
 
-
+######################################################## START DEFAULT PARAMETERS
 struttura_rosa = np.array([3, 8, 8, 6])
 #this must contain all the allowed schemes
 
-formazioni = {
+Formazioni = {
     '352': [1, 3, 5, 2],
     '343': [1, 3, 4, 3],
     '442': [1, 4, 4, 2],
@@ -29,14 +29,14 @@ formazioni = {
     '433': [1, 4, 3, 3]
     #aggiungere tutte le altre formazioni
     }
-fasce_goal = np.array([66,  70,  84,  88,  92,  96, 100])
-fasce_modificatore = np.array([6. , 6.5, 7. , 7.5, 8. ])
-valori_modificatore = np.array([1, 3, 5, 6, 8])
+Fasce_goal = np.array([66,  70,  84,  88,  92,  96, 100])
+Fasce_modificatore = np.array([6. , 6.5, 7. , 7.5, 8. ])
+Valori_modificatore = np.array([1, 3, 5, 6, 8])
 rows_to_skip=[0,1,2,3,4]
 
 N_squadre = 8
 
-
+######################################################## END DEFAULT PARAMETERS
 # In[369]:
 
 
@@ -280,7 +280,7 @@ def assign_quot(rose, quot_dict, team_names):
 # In[383]:
 
 
-def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal):
+def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal, formazioni):
     rose = genera_rose(struttura_rosa, num_squadre)
 
     #voti_giornata is the imported dataframe which will be inserted in the loop
@@ -308,12 +308,12 @@ def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_s
 # In[384]:
 
 
-def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal):
+def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path, num_squadre = N_squadre, valori = Valori_modificatore, fasce = Fasce_modificatore, fasce_goal = Fasce_goal, formazioni = Formazioni):
     range_best = 100;
     q_range_best = 2000;
     for i in range(n_campionati):
         #print('Campionato attuale:' f'{i}\r', end="")
-        classifica, rose, rose_id= simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal)
+        classifica, rose, rose_id= simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal, formazioni)
         quot_dict = all_quot_dict(struttura_rosa, quotazioni, num_squadre)
         classifica_quot = assign_quot(rose_id, quot_dict, team_names)
         range_temp = np.float(classifica.max() - classifica.min())
