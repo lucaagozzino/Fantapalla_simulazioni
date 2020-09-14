@@ -312,7 +312,7 @@ def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path
     range_best = 100;
     q_range_best = 2000;
     for i in range(n_campionati):
-        #print('Campionato attuale:' f'{i}\r', end="")
+        print('Campionato attuale:' f'{i}\r', end="")
         classifica, rose, rose_id= simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal, formazioni)
         quot_dict = all_quot_dict(struttura_rosa, quotazioni, num_squadre)
         classifica_quot = assign_quot(rose_id, quot_dict, team_names)
