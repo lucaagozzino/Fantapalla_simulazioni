@@ -323,7 +323,7 @@ def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path
         classifica_quot = assign_quot(rose_id, quot_dict, team_names)
         range_temp = np.float(classifica.max() - classifica.min())
         q_range_temp = np.float(classifica_quot.max() - classifica_quot.min())
-        if range_temp < range_best and q_range_temp < q_range_best:
+        if (range_temp < range_best + 10 and q_range_temp < q_range_best):
             range_best = range_temp
             q_range_best = q_range_temp
             classifica_best = classifica
