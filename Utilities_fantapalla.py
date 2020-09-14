@@ -13,6 +13,11 @@ from IPython import display
 import pandas as pd
 quotazioni = pd.read_csv ('Quotazioni_Fantacalcio.csv')
 
+#necessary for parallelizing
+import multiprocessing
+from joblib import Parallel, delayed
+num_cores = multiprocessing.cpu_count()
+
 
 # In[368]:
 
