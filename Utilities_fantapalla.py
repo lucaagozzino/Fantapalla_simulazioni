@@ -43,7 +43,7 @@ N_squadre = 8
 def names(num_squadre):
     team_names = []
     teams = {}
-    for i in range(1,num_squadre+1):
+    for i in range(1,N_squadre+1):
         team_names.append("Team " + str(i))
         teams[i] = "Team " + str(i)
     return [teams, team_names]
@@ -52,7 +52,7 @@ def names(num_squadre):
 # In[370]:
 
 
-[teams, team_names] = names(N_squadre)
+#[teams, team_names] = names(N_squadre)
 
 
 # In[371]:
@@ -241,10 +241,9 @@ def points(fixtures, voti_squadre, fasce_goal):
 # In[380]:
 
 
-def id_toName(struttura_rosa, quotazioni, rose, team_names, num_squadre):
-    
+def id_toName(struttura_rosa, quotazioni, rose, num_squadre):
     topPlayers = top_players(struttura_rosa, quotazioni, num_squadre)
-    rose_nomi=pd.DataFrame(columns = team_names, index=range(25))
+    rose_nomi=pd.DataFrame(columns=team_names, index=range(25))
     for team_name in team_names:
         temp_teams = []
         for Myid in rose[team_name]:
@@ -267,7 +266,7 @@ def all_quot_dict(struttura_rosa, quotazioni, num_squadre):
 # In[382]:
 
 
-def assign_quot(rose, quot_dict, team_names): 
+def assign_quot(rose, quot_dict): 
     n,m = np.shape(rose)
     quot = np.zeros((n,m))
     for i in range(n):
@@ -302,7 +301,7 @@ def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_s
     total = pd.DataFrame(data= np.sum(np.array(all_points),axis=1,keepdims=True),  index=team_names, columns =['tot'])
     rose_id=rose
     rose = pd.DataFrame(data=rose, columns = team_names)
-    rose_nomi = id_toName(struttura_rosa, quotazioni, rose, team_names, num_squadre)
+    rose_nomi = id_toName(struttura_rosa, quotazioni, rose, num_squadre)
     return [total, rose_nomi, rose_id]
 
 
@@ -316,7 +315,7 @@ def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path
         #print('Campionato attuale:' f'{i}\r', end="")
         classifica, rose, rose_id= simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre)
         quot_dict = all_quot_dict(struttura_rosa, quotazioni, num_squadre)
-        classifica_quot = assign_quot(rose_id, quot_dict, team_names)
+        classifica_quot = assign_quot(rose_id, quot_dict)
         range_temp = np.float(classifica.max() - classifica.min())
         q_range_temp = np.float(classifica_quot.max() - classifica_quot.min())
         if range_temp < range_best and q_range_temp < q_range_best:
