@@ -43,7 +43,7 @@ N_squadre = 8
 def names(num_squadre):
     team_names = []
     teams = {}
-    for i in range(1,N_squadre+1):
+    for i in range(1,num_squadre+1):
         team_names.append("Team " + str(i))
         teams[i] = "Team " + str(i)
     return [teams, team_names]
@@ -52,7 +52,7 @@ def names(num_squadre):
 # In[370]:
 
 
-[teams, team_names] = names(N_squadre)
+#[teams, team_names] = names(N_squadre)
 
 
 # In[371]:
@@ -138,7 +138,7 @@ def assign_grade(rose, grades_dict):
 # In[375]:
 
 
-def modificatore(voti_dif, valori = valori_modificatore, fasce = fasce_modificatore):
+def modificatore(voti_dif, valori, fasce):
     temp = 0
     media = np.average(voti_dif)
     for i in range(len(fasce)):
@@ -170,7 +170,7 @@ def all_grades_dict(struttura_rosa, quotazioni, voti_giornata, num_squadre):
 
 
 #formazioni and dict_voti_giornata (from all_grades_dict) must be dictionaries
-def voti_max(rose, struttura_rosa, formazioni, dict_voti_giornata, teams,  num_squadre):
+def voti_max(rose, struttura_rosa, formazioni, dict_voti_giornata, teams,  num_squadre, valori, fasce):
     [P,D,C,A]=struttura_rosa
     
     voti_rosa = assign_grade(rose, dict_voti_giornata)
@@ -191,7 +191,7 @@ def voti_max(rose, struttura_rosa, formazioni, dict_voti_giornata, teams,  num_s
             
             extra = 0
             if n_d >=4 and (voti_rosa[idx_d,k]>=6).sum()>=4:
-                extra = modificatore(voti_rosa[idx_d,k])
+                extra = modificatore(voti_rosa[idx_d,k], valori, fasce)
                 #print(extra)
             
             voto = max(voto,np.sum(voti_rosa[idx_all,k]) + extra)
@@ -219,29 +219,29 @@ def goal_scored(voti_squadre, fasce_goal):
 
 def points(fixtures, voti_squadre, fasce_goal):
     goals = goal_scored(voti_squadre, fasce_goal)
-    points = {}
+    points_temp = {}
     matches = len(fixtures)
     for m in range(matches):
         teams = fixtures[m]
         if goals[teams[0]] == goals[teams[1]]:
-            points[teams[0]]=1
-            points[teams[1]]=1
+            points_temp[teams[0]]=1
+            points_temp[teams[1]]=1
     
         elif goals[teams[0]] > goals[teams[1]]:
-            points[teams[0]]=3
-            points[teams[1]]=0
+            points_temp[teams[0]]=3
+            points_temp[teams[1]]=0
             
         elif goals[teams[0]] < goals[teams[1]]:
-            points[teams[0]]=0
-            points[teams[1]]=3
-    return points
+            points_temp[teams[0]]=0
+            points_temp[teams[1]]=3
+    return points_temp
         
 
 
 # In[380]:
 
 
-def id_toName(struttura_rosa, quotazioni, rose, num_squadre):
+def id_toName(struttura_rosa, quotazioni, rose, num_squadre, team_names):
     topPlayers = top_players(struttura_rosa, quotazioni, num_squadre)
     rose_nomi=pd.DataFrame(columns=team_names, index=range(25))
     for team_name in team_names:
@@ -266,7 +266,7 @@ def all_quot_dict(struttura_rosa, quotazioni, num_squadre):
 # In[382]:
 
 
-def assign_quot(rose, quot_dict): 
+def assign_quot(rose, quot_dict, team_names): 
     n,m = np.shape(rose)
     quot = np.zeros((n,m))
     for i in range(n):
@@ -280,8 +280,8 @@ def assign_quot(rose, quot_dict):
 # In[383]:
 
 
-def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path = 'Voti_giornate/', num_squadre = N_squadre):
-    rose = genera_rose(struttura_rosa, num_squadre = 8)
+def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal):
+    rose = genera_rose(struttura_rosa, num_squadre)
 
     #voti_giornata is the imported dataframe which will be inserted in the loop
     all_points = pd.DataFrame(index = team_names)
@@ -293,29 +293,29 @@ def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path = 'Vot
         i+=1
         voti_giornata = pd.read_excel(filename,sheet_name=0,skiprows=rows_to_skip)
         fixtures = fixture_gen(teams)
-        dict_voti_giornata = all_grades_dict(struttura_rosa, quotazioni, voti_giornata, num_squadre = 8)
-        voti_squadre = voti_max(rose, struttura_rosa, formazioni, dict_voti_giornata, teams, num_squadre = 8)
+        dict_voti_giornata = all_grades_dict(struttura_rosa, quotazioni, voti_giornata, num_squadre)
+        voti_squadre = voti_max(rose, struttura_rosa, formazioni, dict_voti_giornata, teams, num_squadre, valori, fasce)
         punti = pd.DataFrame.from_dict(points(fixtures, voti_squadre, fasce_goal),orient='index')
         all_points = pd.concat([all_points,punti],axis=1)
         #print(voti_squadre)
     total = pd.DataFrame(data= np.sum(np.array(all_points),axis=1,keepdims=True),  index=team_names, columns =['tot'])
     rose_id=rose
     rose = pd.DataFrame(data=rose, columns = team_names)
-    rose_nomi = id_toName(struttura_rosa, quotazioni, rose, num_squadre = 8)
+    rose_nomi = id_toName(struttura_rosa, quotazioni, rose, num_squadre, team_names)
     return [total, rose_nomi, rose_id]
 
 
 # In[384]:
 
 
-def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path = 'Voti_giornate/', num_squadre = N_squadre):
+def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal):
     range_best = 100;
     q_range_best = 2000;
     for i in range(n_campionati):
         #print('Campionato attuale:' f'{i}\r', end="")
-        classifica, rose, rose_id= simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre)
+        classifica, rose, rose_id= simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal)
         quot_dict = all_quot_dict(struttura_rosa, quotazioni, num_squadre)
-        classifica_quot = assign_quot(rose_id, quot_dict)
+        classifica_quot = assign_quot(rose_id, quot_dict, team_names)
         range_temp = np.float(classifica.max() - classifica.min())
         q_range_temp = np.float(classifica_quot.max() - classifica_quot.min())
         if range_temp < range_best and q_range_temp < q_range_best:
