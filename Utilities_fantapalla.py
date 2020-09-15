@@ -362,5 +362,7 @@ def ruoli(struttura_rosa):
 # In[ ]:
 
 
-
-
+def FC_colors(dataframe, struttura_rosa):
+    output = dataframe.style.apply(styling_rows, struttura = struttura_rosa, axis = None)\
+                .hide_index()
+    return output
