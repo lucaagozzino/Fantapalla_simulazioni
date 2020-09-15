@@ -335,7 +335,25 @@ def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path
 
 # In[356]:
 
-
+def styling_rows(x, struttura):
+    [P,D,C,A] = struttura
+    color_P = 'background-color: orange; color: black'
+    color_D = 'background-color: darkseagreen; color: black'
+    color_C = 'background-color: cornflowerblue; color: black'
+    color_A = 'background-color: tomato; color: black'
+    df_styler = pd.DataFrame('', index=x.index, columns=x.columns)
+    col_idx = range(df_styler.shape[1])
+    row_idx_P = P
+    row_idx_D = D
+    for idx in range(P):
+        df_styler.iloc[idx, col_idx] = color_P
+    for idx in range(P,P+D):
+        df_styler.iloc[idx, col_idx] = color_D
+    for idx in range(P+D,P+D+C):
+        df_styler.iloc[idx, col_idx] = color_C
+    for idx in range(P+D+C,P+D+C+A):
+        df_styler.iloc[idx, col_idx] = color_A
+    return df_styler
 
 
 
