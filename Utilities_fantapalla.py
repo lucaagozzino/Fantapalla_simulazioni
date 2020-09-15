@@ -14,8 +14,8 @@ import pandas as pd
 quotazioni = pd.read_csv ('Quotazioni_Fantacalcio.csv')
 
 
-from progressbar import ProgressBar
-pbar = ProgressBar()
+import progressbar
+#pbar = progressbar.progressbar()
 
 # In[368]:
 
@@ -317,7 +317,7 @@ def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_s
 def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path, num_squadre = N_squadre, valori = Valori_modificatore, fasce = Fasce_modificatore, fasce_goal = Fasce_goal, formazioni = Formazioni):
     range_best = 100;
     q_range_best = 2000;
-    for i in pbar(range(n_campionati)):
+    for i in progressbar.progressbar(range(n_campionati)):
         #print('Campionato attuale:' f'{i+1}\r', end="")
         classifica, rose, rose_id= simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal, formazioni)
         quot_dict = all_quot_dict(struttura_rosa, quotazioni, num_squadre)
