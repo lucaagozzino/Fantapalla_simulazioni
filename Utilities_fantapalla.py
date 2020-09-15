@@ -337,10 +337,10 @@ def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path
 
 def styling_rows(x, struttura):
     [P,D,C,A] = struttura
-    color_P = 'background-color: orange; color: black'
-    color_D = 'background-color: darkseagreen; color: black'
-    color_C = 'background-color: cornflowerblue; color: black'
-    color_A = 'background-color: tomato; color: black'
+    color_P = 'background-color: rgba(249,168,38,.5); color: black'
+    color_D = 'background-color: rgba(46,125,51,.5); color: black'
+    color_C = 'background-color: rgba(21,119,189,.5); color: black'
+    color_A = 'background-color: rgba(198,40,39,.5); color: black'
     df_styler = pd.DataFrame('', index=x.index, columns=x.columns)
     col_idx = range(df_styler.shape[1])
     row_idx_P = P
