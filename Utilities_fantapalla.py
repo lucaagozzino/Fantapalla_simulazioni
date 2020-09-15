@@ -355,6 +355,8 @@ def styling_rows(x, struttura):
         df_styler.iloc[idx, col_idx] = color_A
     return df_styler
 
+def ruoli(struttura_rosa):
+    return struttura_rosa[0]*['P']+struttura_rosa[1]*['D']+struttura_rosa[2]*['C']+struttura_rosa[3]*['A']
 
 
 # In[ ]:
