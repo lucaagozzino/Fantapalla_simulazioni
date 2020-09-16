@@ -14,6 +14,9 @@ import pandas as pd
 quotazioni = pd.read_csv ('Quotazioni_Fantacalcio.csv')
 
 from joblib import Parallel, delayed
+import multiprocessing
+
+N_cores = multiprocessing.cpu_count()
 
 import progressbar
 #pbar = progressbar.progressbar()
@@ -327,7 +330,7 @@ def simula_campionato_Parallel(struttura_rosa, team_names, teams, quotazioni, pa
     all_points = pd.DataFrame(index = team_names)
     all_files = glob.glob(path + "/*.xlsx")
     i=1
-    full_season = Parallel(n_jobs=8)(delayed(calcola_giornata)(file_name, teams, struttura_rosa, quotazioni, num_squadre, fasce_goal, rose, formazioni, valori, fasce) for file_name in all_files)
+    full_season = Parallel(n_jobs = N_cores)(delayed(calcola_giornata)(file_name, teams, struttura_rosa, quotazioni, num_squadre, fasce_goal, rose, formazioni, valori, fasce) for file_name in all_files)
     standings = pd.concat(full_season, axis=1)
     total = pd.DataFrame(data= np.sum(np.array(standings),axis=1,keepdims = True),  index=team_names, columns =['tot'])
     rose_id=rose
