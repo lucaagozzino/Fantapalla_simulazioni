@@ -13,6 +13,7 @@ from IPython import display
 import pandas as pd
 quotazioni = pd.read_csv ('Quotazioni_Fantacalcio.csv')
 
+from joblib import Parallel, delayed
 
 import progressbar
 #pbar = progressbar.progressbar()
@@ -286,6 +287,7 @@ def assign_quot(rose, quot_dict, team_names):
 # In[383]:
 
 
+
 def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal, formazioni):
     rose = genera_rose(struttura_rosa, num_squadre)
 
@@ -310,16 +312,39 @@ def simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_s
     rose_nomi = id_toName(struttura_rosa, quotazioni, rose, num_squadre, team_names)
     return [total, rose_nomi, rose_id]
 
+def calcola_giornata(filename, teams, struttura_rosa, quotazioni, num_squadre, fasce_goal, rose, formazioni, valori, fasce):
+    voti_giornata = pd.read_excel(filename,sheet_name=0,skiprows=rows_to_skip)
+    fixtures = fixture_gen(teams)
+    dict_voti_giornata = all_grades_dict(struttura_rosa, quotazioni, voti_giornata, num_squadre)
+    voti_squadre = voti_max(rose, struttura_rosa, formazioni, dict_voti_giornata, teams, num_squadre, valori, fasce)
+    punti= pd.DataFrame.from_dict(points(fixtures, voti_squadre, fasce_goal), orient = 'index')
+    return punti
+
+def simula_campionato_Parallel(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal, formazioni):
+    rose = genera_rose(struttura_rosa, num_squadre)
+
+    #voti_giornata is the imported dataframe which will be inserted in the loop
+    all_points = pd.DataFrame(index = team_names)
+    all_files = glob.glob(path + "/*.xlsx")
+    i=1
+    full_season = Parallel(n_jobs=8)(delayed(calcola_giornata)(file_name, teams, struttura_rosa, quotazioni, num_squadre, fasce_goal, rose, formazioni, valori, fasce) for file_name in all_files)
+    standings = pd.concat(full_season, axis=1)
+    total = pd.DataFrame(data= np.sum(np.array(standings),axis=1,keepdims = True),  index=team_names, columns =['tot'])
+    rose_id=rose
+    rose = pd.DataFrame(data=rose, columns = team_names)
+    rose_nomi = id_toName(struttura_rosa, quotazioni, rose, num_squadre, team_names)
+    return [total, rose_nomi, rose_id]
+
 
 # In[384]:
-
+# if we want to extract data to train a network we need to parallelize this loop in order to save all the teams and the ranges
 
 def main_model(n_campionati, struttura_rosa, team_names, teams, quotazioni, path, num_squadre = N_squadre, valori = Valori_modificatore, fasce = Fasce_modificatore, fasce_goal = Fasce_goal, formazioni = Formazioni):
     range_best = 100;
     q_range_best = 2000;
     for i in progressbar.progressbar(range(n_campionati)):
         #print('Campionato attuale:' f'{i+1}\r', end="")
-        classifica, rose, rose_id= simula_campionato(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal, formazioni)
+        classifica, rose, rose_id= simula_campionato_Parallel(struttura_rosa, team_names, teams, quotazioni, path, num_squadre, valori, fasce, fasce_goal, formazioni)
         quot_dict = all_quot_dict(struttura_rosa, quotazioni, num_squadre)
         classifica_quot = assign_quot(rose_id, quot_dict, team_names)
         range_temp = np.float(classifica.max() - classifica.min())
