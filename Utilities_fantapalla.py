@@ -82,7 +82,7 @@ def fixture_gen(teams):
 
 def genera_rose(struttura_rosa, num_squadre):
     
-    giocatori = struttura_rosa*num_squadre
+    giocatori = np.array(struttura_rosa)*num_squadre
     tot_giocatori = sum(giocatori)
     
     [p,d,c,a] = giocatori
@@ -255,7 +255,7 @@ def points(fixtures, voti_squadre, fasce_goal):
 
 def id_toName(struttura_rosa, quotazioni, rose, num_squadre, team_names):
     topPlayers = top_players(struttura_rosa, quotazioni, num_squadre)
-    rose_nomi=pd.DataFrame(columns=team_names, index=range(25))
+    rose_nomi=pd.DataFrame(columns=team_names, index=range(np.sum(struttura_rosa)))
     for team_name in team_names:
         temp_teams = []
         for Myid in rose[team_name]:
@@ -272,7 +272,7 @@ def all_quot_dict(struttura_rosa, quotazioni, num_squadre):
     temp_quot={}
     for idx in players['My Id']:
         temp_quot[idx] = players['Quotazione'][idx]
-    return temp_quot # struttura My Id: voto
+    return temp_quot # struttura My Id: quotazione
 
 
 # In[382]:
@@ -281,6 +281,7 @@ def all_quot_dict(struttura_rosa, quotazioni, num_squadre):
 def assign_quot(rose, quot_dict, team_names): 
     n,m = np.shape(rose)
     quot = np.zeros((n,m))
+    rose = np.array(rose)
     for i in range(n):
         for j in range(m):
             if rose[i,j] in quot_dict:
