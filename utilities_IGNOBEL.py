@@ -10,7 +10,7 @@ driver = webdriver.Chrome(options=options, executable_path=r'/usr/local/bin/chro
 
 #rivedere i vari xpath, nel caso in cui la struttura del sito e' diversa
 
-def formazioni(link = 'https://leghe.fantacalcio.it/fantapalla/formazioni'):#'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
+def formazioni(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):#'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
     
     #sample_link'https://leghe.fantacalcio.it/fantapalla/formazioni'
     driver.get(link)
@@ -94,3 +94,22 @@ def count(I = infortunati(), R = rose()):
             c.append(player in all_names)
         count_inf[team] = sum(c)
     return pd.DataFrame(data = count_inf, index = ['N. Inf.'])
+
+def voti_panchina(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
+    driver.get(link)
+
+    all_voti = {}
+    for l in [2,3,4,5]:
+        for k in [1,2]:
+            name = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[1]/div["+str(k)+"]/div/div[2]/h4").text
+            #test_o = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item odd  ']/td[1]/span/span[2]/a")
+            #test_e = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item even  ']/td[1]/span/span[2]/a")
+            voto_o = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item odd  ']/td[5]/span")
+            voto_e = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item even  ']/td[5]/span")
+            voti = voto_o+voto_e
+            tot = []
+            for el in voti:
+                if el.text != '-':
+                    tot.append(float(el.text))
+            all_voti[name] = [sum(tot)]
+    return pd.DataFrame(data=all_voti,index = ['Tot Voti'])
