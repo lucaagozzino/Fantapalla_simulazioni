@@ -1,4 +1,6 @@
-# Fantapalla_simulazioni
+# Fantapalla_Forever_database
+
+## Algoritmo Rose
 
 Il programma compie le seguenti operazioni 
 
@@ -11,3 +13,11 @@ Il programma compie le seguenti operazioni
   - repeat
   
 Cosi' dopo N_campionati simulati si trova la rosa che minimizza le differenze di prestazioni e di valore
+
+La versione aggiornata assegna le rose parziali solo sulla base delle quotazioni
+
+## IGNOBEL database
+
+lo script contiene delle funzioni che permettono di scaricare in tempo reale le rose, le formazioni schierate, tutti gli infortunati, di contare gli infortunati per ogni squadra e di calcolare la somma dei voti dei panchinari che non sono scesi in campo
+
+a breve il calcolo dei gol subiti, dei cartellini e del modificatore difesa
