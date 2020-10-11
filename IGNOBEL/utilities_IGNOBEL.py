@@ -83,7 +83,7 @@ def rose(link = 'https://leghe.fantacalcio.it/fantapalla-forever/area-gioco/rose
         
     return pd.DataFrame(data=rose)
 
-def count(I = infortunati(), R = rose()):
+def count_inf(I = infortunati(), R = rose()):
     count_inf = {}
     test = list(filter(None,I.values.flatten()))
     separator = ','
@@ -93,7 +93,7 @@ def count(I = infortunati(), R = rose()):
         for player in R[team]:
             c.append(player in all_names)
         count_inf[team] = sum(c)
-    return pd.DataFrame(data = count_inf, index = ['N. Inf.'])
+    return pd.DataFrame(data = count_inf, index = ['tot Infortunati'])
 
 def voti_panchina(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
     driver.get(link)
@@ -112,4 +112,37 @@ def voti_panchina(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formaz
                 if el.text != '-':
                     tot.append(float(el.text))
             all_voti[name] = [sum(tot)]
-    return pd.DataFrame(data=all_voti,index = ['Tot Voti'])
+    return pd.DataFrame(data=all_voti,index = ['Voti Panchinari'])
+
+
+def goal_subiti(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
+    driver.get(link)
+
+    all_goal = {}
+    for l in [2,3,4,5]:
+        for k in [1,2]:
+            name = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[1]/div["+str(k)+"]/div/div[2]/h4").text
+            if len(driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[1]/tbody/tr[@class='player-list-item even  out']/td[1]/span/span[@class='role role-p']")) == 0:
+                goal = len(driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[1]/tbody/tr[1]/td[3]/ul/li[@data-original-title= 'Gol subito (-1)']"))
+            else:
+                goal1 = len(driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class='player-list-item even in ']/td[3]/ul/li[@data-original-title='Gol subito (-1)']"))
+                goal2 = len(driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class='player-list-item odd in ']/td[3]/ul/li[@data-original-title='Gol subito (-1)']"))
+                goal = max(goal1,goal2)
+            all_goal[name] = goal
+
+    return pd.DataFrame(data=all_goal,index = ['Goal subiti'])
+
+
+def modificatore(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
+    driver.get(link)
+
+    all_mod = {}
+    for l in [2,3,4,5]:
+        for k in [1,2]:
+            name = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[1]/div["+str(k)+"]/div/div[2]/h4").text
+            all_mod[name] = 0
+            temp = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[3]/tbody/tr[1]/td[1]/span")
+            if len(temp)>0 and temp[0].text == 'Modificatore Difesa':
+                mod = float(driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[3]/tbody/tr[1]/td[2]/span").text)
+                all_mod[name] = mod
+    return pd.DataFrame(data=all_mod, index = ['Modificatore'])
