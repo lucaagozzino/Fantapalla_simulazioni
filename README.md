@@ -14,7 +14,11 @@ Il programma compie le seguenti operazioni
   
 Cosi' dopo N_campionati simulati si trova la rosa che minimizza le differenze di prestazioni e di valore
 
-La versione aggiornata assegna le rose parziali solo sulla base delle quotazioni
+La versione aggiornata assegna le rose parziali solo sulla base delle quotazioni. Si trova nel notebook 
+
+Rose_quotazioni.ipynb
+
+che sfrutta lo stesso python script.
 
 ## IGNOBEL database
 
