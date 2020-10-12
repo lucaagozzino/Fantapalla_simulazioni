@@ -147,3 +147,11 @@ def modificatore(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazi
                 mod = float(driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[3]/tbody/tr[1]/td[2]/span").text)
                 all_mod[name] = mod
     return pd.DataFrame(data=all_mod, index = ['Modificatore'])
+
+
+def scarica_voti(giornata, stagione ='2020-21'):
+    data = pd.read_excel('http://www.fantacalcio.it/Servizi/Excel.ashx?type=1&g='+str(giornata)+'&t=1601872625000&s='+stagione,skiprows = [0,1,2,3,4])
+    data = data[data.Nome != 'Nome']
+    data = data.dropna()
+    data.index = list(range(len(data)))
+    return data
