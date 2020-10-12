@@ -1,7 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import pandas as pd
-from selenium.common.exceptions import NoSuchElementException        
+from selenium.common.exceptions import NoSuchElementException   
+import progressbar
 
 options = Options()
 options.headless = True
@@ -83,7 +84,7 @@ def rose(link = 'https://leghe.fantacalcio.it/fantapalla-forever/area-gioco/rose
         
     return pd.DataFrame(data=rose)
 
-def count_inf(I = infortunati(), R = rose()):
+def count_inf(I , R ):
     count_inf = {}
     test = list(filter(None,I.values.flatten()))
     separator = ','
