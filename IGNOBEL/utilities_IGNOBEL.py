@@ -99,7 +99,7 @@ def count_inf(I , R ):
         count_inf[team] = sum(c)
     return pd.DataFrame(data = count_inf, index = ['tot Infortunati'])
 
-def voti_panchina(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
+def voti_panchina(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni?id=185855'):
     driver.get(link)
 
     all_voti = {}
@@ -119,7 +119,7 @@ def voti_panchina(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formaz
     return pd.DataFrame(data=all_voti,index = ['Voti Panchinari'])
 
 
-def goal_subiti(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
+def goal_subiti(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni?id=185855'):
     driver.get(link)
 
     all_goal = {}
@@ -137,7 +137,7 @@ def goal_subiti(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazio
     return pd.DataFrame(data=all_goal,index = ['Goal subiti'])
 
 
-def modificatore(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
+def modificatore(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni?id=185855'):
     driver.get(link)
 
     all_mod = {}
