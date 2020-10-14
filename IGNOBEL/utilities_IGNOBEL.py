@@ -11,26 +11,29 @@ driver = webdriver.Chrome(options=options, executable_path=r'/usr/local/bin/chro
 
 #rivedere i vari xpath, nel caso in cui la struttura del sito e' diversa
 
-def formazioni(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):#'https://leghe.fantacalcio.it/fantapalla-forever/formazioni'):
-    
-    #sample_link'https://leghe.fantacalcio.it/fantapalla/formazioni'
+def formazioni(competizione = 'campionato'):
+    #if competizione == 'campionato':
+    link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni?id=185855'
     driver.get(link)
-    formazioni = {}
-    
+
+    players = {}
     for l in [2,3,4,5]:
         for k in [1,2]:
-            temp = []
-            for i in range(1,12):
-                test = driver.find_element_by_xpath('/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div/div['+str(l)+']/div[2]/div['+str(k)+']/table[1]/tbody/tr['+str(i)+']/td[1]/span/span[2]/a')
-                team_name = driver.find_element_by_xpath('/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div/div['+str(l)+']/div[1]/div['+str(k)+']/div/div[2]/h4')
-                temp.append(test.text)
-            for j in range(1,8):
-                test = driver.find_element_by_xpath('/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div/div['+str(l)+']/div[2]/div['+str(k)+']/table[2]/tbody/tr['+str(j)+']/td[1]/span/span[2]/a')
-                #test = driver.find_element_by_xpath('/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div/div[2]/div[2]/div[2]/table[2]/tbody/tr['+str(j)+']/td[1]/span/span[2]/a')
-                temp.append(test.text)
-            formazioni[team_name.text]= temp
-            
-    return pd.DataFrame(data=formazioni)
+            name = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div/div["+str(l)+"]/div[1]/div["+str(k)+"]/div/div[2]/h4").text
+
+
+            all_playersE = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[1]/tbody/tr[@class='player-list-item even  ']/td[1]/span/span[2]/a")
+            all_playersO = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[1]/tbody/tr[@class='player-list-item odd  ']/td[1]/span/span[2]/a")
+            all_playersEP = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class='player-list-item even  ']/td[1]/span/span[2]/a")
+            all_playersOP = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class='player-list-item odd  ']/td[1]/span/span[2]/a")
+            #all_playersE = driver.find_elements_by_xpath("")
+
+            all_pl = all_playersE + all_playersO + all_playersEP + all_playersOP
+            names = []
+            for pl in all_pl:
+                names.append((pl.text).upper())
+            players[name] = names
+    return pd.DataFrame.from_dict(data=players, orient='index').T
 
 def check_exists_by_xpath(xpath):
     try:
