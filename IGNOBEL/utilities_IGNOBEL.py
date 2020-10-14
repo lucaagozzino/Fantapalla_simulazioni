@@ -45,29 +45,13 @@ def check_exists_by_xpath(xpath):
 def infortunati(link = 'https://www.pianetafanta.it/Giocatori-Infortunati.asp'):
 
     driver.get(link)
+    names = driver.find_elements_by_xpath("//*[@id='my_id_div']/div[6]/div[11]/div[2]/div/div[@class]/div/table/tbody/tr[@class]/td[2]/a/strong")
 
-    test={}
+    players = []
+    for n in names:
+        players.append(n.text.upper())
 
-    j=3
-    while True:
-        if check_exists_by_xpath('//*[@id="my_id_div"]/div[6]/div[11]/div[2]/div/div['+str(j)+']/div/div[1]/h3/strong'):
-            team = (driver.find_element_by_xpath('//*[@id="my_id_div"]/div[6]/div[11]/div[2]/div/div['+str(j)+']/div/div[1]/h3/strong').text).upper()
-        else:
-            break
-        temp=[]
-        i=2
-        while True:
-            if check_exists_by_xpath('//*[@id="my_id_div"]/div[6]/div[11]/div[2]/div/div['+str(j)+']/div/table/tbody/tr['+ str(i) +']/td[2]/a/strong'):
-                temp.append((driver.find_element_by_xpath('//*[@id="my_id_div"]/div[6]/div[11]/div[2]/div/div['+str(j)+']/div/table/tbody/tr['+ str(i) +']/td[2]/a/strong').text).upper())
-                i += 1
-            else: 
-                break
-        j += 1
-        test[team] = temp
-
-    infortunati = pd.DataFrame.from_dict(data=test, orient='index').T
-
-    return infortunati
+    return players
 
 def rose(link = 'https://leghe.fantacalcio.it/fantapalla-forever/area-gioco/rose'):
     
@@ -78,26 +62,28 @@ def rose(link = 'https://leghe.fantacalcio.it/fantapalla-forever/area-gioco/rose
     for j in range(1,9):
         test_1 = []
         name = (driver.find_element_by_xpath('/html/body/div[7]/main/div[3]/div[2]/div[1]/div[2]/div[2]/ul/li['+str(j)+']/div/div[1]/div[2]/h4').text).upper()
-        for i in range(1,26):
-            temp_1 = driver.find_element_by_xpath('/html/body/div[7]/main/div[3]/div[2]/div[1]/div[2]/div[2]/ul/li['+str(j)+']/table/tbody/tr['+str(i)+']/td[2]/a/b')
-            #test_2 = driver.find_element_by_xpath('/html/body/div[7]/main/div[3]/div[2]/div[1]/div[2]/div[2]/ul/li[1]/table/tbody/tr[2]/td[2]/a/b')
-            test_1.append((temp_1.text).upper())
+        players = driver.find_elements_by_xpath('/html/body/div[7]/main/div[3]/div[2]/div[1]/div[2]/div[2]/ul/li['+str(j)+']/table/tbody/tr[@class]/td[2]/a/b')
+        for pl in players:
+            test_1.append((pl.text).upper())
+
         rose[name] = test_1
         
         
-    return pd.DataFrame(data=rose)
+    return pd.DataFrame.from_dict(data=rose, orient='index').T
 
 def count_inf(I , R ):
-    count_inf = {}
-    test = list(filter(None,I.values.flatten()))
-    separator = ','
-    all_names = separator.join(test)
+    count = {}
+
+    all_names = ''.join(I)
     for team in R:
-        c = []
+        c = 0
         for player in R[team]:
-            c.append(player in all_names)
-        count_inf[team] = sum(c)
-    return pd.DataFrame(data = count_inf, index = ['tot Infortunati'])
+            if player == None:
+                continue
+            if player in ''.join(I):
+                c+=1
+        count[team] = c
+    return pd.DataFrame(data = count, index = ['tot Infortunati'])
 
 def voti_panchina(link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni?id=185855'):
     driver.get(link)
