@@ -53,7 +53,7 @@ def infortunati(link = 'https://www.pianetafanta.it/Giocatori-Infortunati.asp'):
 
     return players
 
-def rose(link = 'https://leghe.fantacalcio.it/fantapalla-forever/area-gioco/rose'):
+def rose(link = 'https://leghe.fantacalcio.it/fantapalla-forever/area-gioco/rose?id=185855'):
     
     driver.get(link)
     rose = {}
