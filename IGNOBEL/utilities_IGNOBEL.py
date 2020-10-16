@@ -42,16 +42,29 @@ def check_exists_by_xpath(xpath):
         return False
     return True
 
-def infortunati(link = 'https://www.pianetafanta.it/Giocatori-Infortunati.asp'):
+#def infortunati(link = 'https://www.pianetafanta.it/Giocatori-Infortunati.asp'):
+
+#    driver.get(link)
+#    names = driver.find_elements_by_xpath("//*[@id='my_id_div']/div[6]/div[11]/div[2]/div/div[@class]/div/table/tbody/tr[@class]/td[2]/a/strong")
+
+#    players = []
+#    for n in names:
+#        players.append(n.text.upper())
+
+#    return players
+
+def infortunati(link = 'https://www.fantacalcio.it/cartella-medica/'):
 
     driver.get(link)
-    names = driver.find_elements_by_xpath("//*[@id='my_id_div']/div[6]/div[11]/div[2]/div/div[@class]/div/table/tbody/tr[@class]/td[2]/a/strong")
+    button = driver.find_element_by_id("tabAll")
 
-    players = []
-    for n in names:
-        players.append(n.text.upper())
+    driver.execute_script("arguments[0].click();", button)
 
-    return players
+    test = driver.find_elements_by_xpath("/html/body/div[7]/div[5]/main/div/div/div/div[1]/div[2]/div[5]/div[@class]/div/div/div[2]/div/div[1]/p[@class]/span")
+    all_inf = []
+    for pl in test:
+        all_inf.append(pl.text)
+    return all_inf
 
 def rose(link = 'https://leghe.fantacalcio.it/fantapalla-forever/area-gioco/rose?id=185855'):
     
