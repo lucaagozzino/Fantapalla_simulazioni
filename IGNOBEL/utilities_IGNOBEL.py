@@ -184,5 +184,6 @@ def IGNOBEL_tot(giornata):
     M = modificatore(giornata) 
     C = cartellini(giornata)
     CI = count_inf(infortunati(), rose())
-    
-    return pd.concat([CI,V,G,M,C], axis = 0)
+    output = pd.concat([CI,V,G,M,C], axis = 0).T
+    output = output.astype({"tot Infortunati": int,"Goal subiti": int, "Modificatore": int,"C. gialli": int,"C. rossi": int}) 
+    return output
