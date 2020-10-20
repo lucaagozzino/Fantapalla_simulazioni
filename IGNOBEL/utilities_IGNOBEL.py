@@ -178,12 +178,46 @@ def cartellini(giornata):
             all_cart[name] = [gialli+gialliPE+gialliPO, rossi]
     return pd.DataFrame(data=all_cart,index = ['C. gialli','C. rossi'])
 
+def fantapunti_subiti(giornata):
+    link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni/'+str(giornata)
+    driver.get(link)
+
+    all_punti = {}
+    for l in [2,3,4,5]:
+        name={}
+        punti={}
+        for k in [1,2]:
+            name[k] = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[1]/div["+str(k)+"]/div/div[2]/h4").text.upper()
+            punti[k] = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[4]/tfoot/tr/td[2]/div").text[:-7]
+        all_punti[name[1]]=punti[2]
+        all_punti[name[2]]=punti[1]
+            
+    return pd.DataFrame(data=all_punti,index = ['Fantapunti Subiti'])  
+
+def fantapunti_fatti(giornata):
+    link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni/'+str(giornata)
+    driver.get(link)
+
+    all_punti = {}
+    for l in [2,3,4,5]:
+        name={}
+        punti={}
+        for k in [1,2]:
+            name[k] = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[1]/div["+str(k)+"]/div/div[2]/h4").text.upper()
+            punti[k] = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[4]/tfoot/tr/td[2]/div").text[:-7]
+        all_punti[name[1]]=float(punti[1])
+        all_punti[name[2]]=float(punti[2])
+            
+    return pd.DataFrame(data=all_punti,index = ['Fantapunti Fatti'])
+
 def IGNOBEL_tot(giornata):
     V = voti_panchina(giornata) 
     G = goal_subiti(giornata)
     M = modificatore(giornata) 
     C = cartellini(giornata)
     CI = count_inf(infortunati(), rose())
-    output = pd.concat([CI,V,G,M,C], axis = 0).T
+    F = fantapunti_fatti(giornata)
+    S = fantapunti_subiti(giornata)
+    output = pd.concat([F,S,G,C,V,M,CI], axis = 0).T
     output = output.astype({"tot Infortunati": int,"Goal subiti": int, "Modificatore": int,"C. gialli": int,"C. rossi": int}) 
-    return output
+    return output.T
