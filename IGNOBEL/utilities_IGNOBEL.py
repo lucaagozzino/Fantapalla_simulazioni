@@ -261,3 +261,19 @@ def storico_individuale(nome, giornata):
     df = df[1:] #take the data less the header row
     df.columns = new_header
     return df
+
+def aggiorna_database(giornata):
+    nomi=[
+        'enzo',
+        'pietro',
+        'mario',
+        'federico',
+        'francesco',
+        'nanni',
+        'emiliano',
+        'luca'
+    ]
+    for name in nomi:
+        df = storico_individuale(name, giornata)
+        df.to_pickle("Dati_individuali/"+ name +".pkl")
+    print("Dati aggiornati fino alla "+str(giornata)+" giornata")
