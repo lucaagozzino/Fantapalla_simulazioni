@@ -98,7 +98,7 @@ def count_inf(I , R ):
         count[team] = c
     return pd.DataFrame(data = count, index = ['tot Infortunati'])
 
-def voti_panchina(giornata):
+def bonus_panchina(giornata):
     link = 'https://leghe.fantacalcio.it/fantapalla-forever/formazioni/'+str(giornata)
     driver.get(link)
 
@@ -107,15 +107,18 @@ def voti_panchina(giornata):
         for k in [1,2]:
             name = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[1]/div["+str(k)+"]/div/div[2]/h4").text.upper()
             #name = driver.find_element_by_xpath("/html/body/div[12]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[1]/div["+str(k)+"]/div/div[2]/h4").text
-            voto_o = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item odd  ']/td[5]/span")
-            voto_e = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item even  ']/td[5]/span")
-            voti = voto_o+voto_e
+            Fvoto_o = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item odd  ']/td[5]/span")
+            Nvoto_o = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item odd  ']/td[4]/span")
+            Fvoto_e = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item even  ']/td[5]/span")
+            Nvoto_e = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[2]/tbody/tr[@class = 'player-list-item even  ']/td[4]/span")
+            Fvoti = Fvoto_o + Fvoto_e
+            Nvoti = Nvoto_o + Nvoto_e
             tot = []
-            for el in voti:
-                if el.text != '-':
-                    tot.append(float(el.text))
+            for i in range(len(Fvoti)):
+                if Fvoti[i].text != '-':
+                    tot.append(max(0,float(Fvoti[i].text)-float(Nvoti[i].text)))
             all_voti[name] = [sum(tot)]
-    return pd.DataFrame(data=all_voti,index = ['Voti Panchinari'])
+    return pd.DataFrame(data=all_voti,index = ['Bonus Panchinari'])
 
 
 def goal_subiti(giornata):
@@ -189,8 +192,8 @@ def fantapunti_subiti(giornata):
         for k in [1,2]:
             name[k] = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[1]/div["+str(k)+"]/div/div[2]/h4").text.upper()
             punti[k] = driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[4]/tfoot/tr/td[2]/div").text[:-7]
-        all_punti[name[1]]=punti[2]
-        all_punti[name[2]]=punti[1]
+        all_punti[name[1]]=float(punti[2])
+        all_punti[name[2]]=float(punti[1])
             
     return pd.DataFrame(data=all_punti,index = ['Fantapunti Subiti'])  
 
@@ -211,7 +214,7 @@ def fantapunti_fatti(giornata):
     return pd.DataFrame(data=all_punti,index = ['Fantapunti Fatti'])
 
 def IGNOBEL_tot(giornata):
-    V = voti_panchina(giornata) 
+    V = bonus_panchina(giornata) 
     G = goal_subiti(giornata)
     M = modificatore(giornata) 
     C = cartellini(giornata)
@@ -221,3 +224,40 @@ def IGNOBEL_tot(giornata):
     output = pd.concat([F,S,G,C,V,M,CI], axis = 0).T
     output = output.astype({"tot Infortunati": int,"Goal subiti": int, "Modificatore": int,"C. gialli": int,"C. rossi": int}) 
     return output.T
+
+def storico_IG(giornata, dict_names, path = "Dati_storici/"):
+
+    test_dict={
+        'enzo':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
+        'pietro':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
+        'mario':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
+        'federico':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
+        'francesco':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
+        'nanni':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
+        'emiliano':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
+        'luca':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']}}
+    for i in range(1,giornata+1):
+        G=pd.read_pickle(path+"Giornata_"+str(i)+".pkl")
+        for team, content in G.items():
+            test_dict[dict_names[team]][i] = [i, content[0], float(content[1]), content[2], content[3]+2*content[4], content[5], content[6], content[7], dict_names[team]]
+    return(test_dict)
+
+def storico_individuale(nome, giornata):
+    dict_names={
+    'AS 800A': 'enzo',
+    'PDG 1908': 'pietro',
+    'IGNORANZA EVERYWHERE': 'mario',
+    'SOROS FC': 'federico',
+    'MAINZ NA GIOIA': 'francesco',
+    'PALLA PAZZA': 'nanni',
+    'I DISEREDATI': 'emiliano',
+    'XYZ': 'luca'
+    }
+
+    test_dict = storico_IG(giornata, dict_names)
+    
+    df = pd.DataFrame(data=test_dict[nome]).T
+    new_header = df.iloc[0] #grab the first row for the header
+    df = df[1:] #take the data less the header row
+    df.columns = new_header
+    return df
