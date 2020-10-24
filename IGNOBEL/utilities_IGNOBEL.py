@@ -231,8 +231,8 @@ def storico_IG(giornata, dict_names, path = "Dati_storici/"):
         'enzo':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
         'pietro':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
         'mario':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
-        'federico':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
-        'francesco':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
+        'musci8':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
+        'franky':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
         'nanni':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
         'emiliano':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']},
         'luca':{0:['gg','pf','ps','gs','c','pan','mod','inf','nome']}}
@@ -247,8 +247,8 @@ def storico_individuale(nome, giornata):
     'AS 800A': 'enzo',
     'PDG 1908': 'pietro',
     'IGNORANZA EVERYWHERE': 'mario',
-    'SOROS FC': 'federico',
-    'MAINZ NA GIOIA': 'francesco',
+    'SOROS FC': 'musci8',
+    'MAINZ NA GIOIA': 'franky',
     'PALLA PAZZA': 'nanni',
     'I DISEREDATI': 'emiliano',
     'XYZ': 'luca'
@@ -267,8 +267,8 @@ def aggiorna_database(giornata):
         'enzo',
         'pietro',
         'mario',
-        'federico',
-        'francesco',
+        'musci8',
+        'franky',
         'nanni',
         'emiliano',
         'luca'
