@@ -53,8 +53,8 @@ def check_exists_by_xpath(xpath):
 
 #    return players
 
-def infortunati(link = 'https://www.fantacalcio.it/cartella-medica/'):
-
+def infortunati(giornata):
+    link = 'https://www.fantacalcio.it/cartella-medica/'+str(giornata+3)#adjusted for our start of the season
     driver.get(link)
     button = driver.find_element_by_id("tabAll")
 
@@ -218,7 +218,7 @@ def IGNOBEL_tot(giornata):
     G = goal_subiti(giornata)
     M = modificatore(giornata) 
     C = cartellini(giornata)
-    CI = count_inf(infortunati(), rose())
+    CI = count_inf(infortunati(giornata), rose())
     F = fantapunti_fatti(giornata)
     S = fantapunti_subiti(giornata)
     output = pd.concat([F,S,G,C,V,M,CI], axis = 0).T
