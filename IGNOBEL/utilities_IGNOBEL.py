@@ -260,6 +260,8 @@ def storico_individuale(nome, giornata):
     new_header = df.iloc[0] #grab the first row for the header
     df = df[1:] #take the data less the header row
     df.columns = new_header
+    #df = df.reset_index()
+    #df = df.drop('index',axis=1)
     return df
 
 def aggiorna_database(giornata):
