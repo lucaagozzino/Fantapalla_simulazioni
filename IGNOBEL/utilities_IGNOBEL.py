@@ -153,7 +153,7 @@ def modificatore(giornata):
             temp = driver.find_elements_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[3]/tbody/tr/td[1]/span")
             if len(temp)>0 and temp[0].text == 'Modificatore Difesa':
                 mod = float(driver.find_element_by_xpath("/html/body/div[7]/main/div[3]/div[2]/div[1]/div[1]/div/div[2]/div["+str(l)+"]/div[2]/div["+str(k)+"]/table[3]/tbody/tr/td[2]/span").text)
-                all_mod[name] = int(mod)
+                all_mod[name] = float(mod)
     return pd.DataFrame(data=all_mod, index = ['Modificatore'])
 
 
