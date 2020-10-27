@@ -222,7 +222,7 @@ def IGNOBEL_tot(giornata):
     F = fantapunti_fatti(giornata)
     S = fantapunti_subiti(giornata)
     output = pd.concat([F,S,G,C,V,M,CI], axis = 0).T
-    output = output.astype({"tot Infortunati": int,"Goal subiti": int, "Modificatore": int,"C. gialli": int,"C. rossi": int}) 
+    #output = pd.concat([F,S,G,C,V,M], axis = 0).T
     return output.T
 
 def storico_IG(giornata, dict_names, path = "Dati_storici/"):
