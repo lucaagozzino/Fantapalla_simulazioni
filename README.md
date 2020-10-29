@@ -1,5 +1,13 @@
 # Fantapalla_Forever_database
 
+La repo e' suddivisa nelle seguenti cartelle:
+
+- Prototyping: contiene notebook temporanei utilizzati per la fase di costruzione degli algoritmi
+- Logos: contiene il logo di ciascuna squadra del torneo
+- Algoritmo_rose: contiene algoritmi e dati usati per generare le rose all'inizio della competizione
+- IGNOBEL: contiene tutti i notebook e gli script usati per i premi speciali e per le statistiche
+
+
 ## Algoritmo Rose
 
 Il programma compie le seguenti operazioni 
@@ -20,8 +28,12 @@ Rose_quotazioni.ipynb
 
 che sfrutta lo stesso python script.
 
-## IGNOBEL database
+## IGNOBEL 
 
-lo script contiene delle funzioni che permettono di scaricare in tempo reale le rose, le formazioni schierate, tutti gli infortunati, di contare gli infortunati per ogni squadra e di calcolare la somma dei voti dei panchinari che non sono scesi in campo
+Sono presenti 2 notebook principali:
 
-a breve il calcolo dei gol subiti, dei cartellini e del modificatore difesa
+- IGNOBEL, che sfrutta il relativo script di utilities per fare webparsing sul sito fantacalcio.it ed estrarre tutti i risultati di giornata necessari per calcolare premi e statistiche, e salva tutti nelle cartelle Dati
+
+- FantapallaStats, che prende i dati dalle cartelle e permette il calcolo di statistiche e premi IGNOBEL
+
+- FantapallaStats_2.0, nuova versione piu' modulare del precedente notebook, che riversa sullo script relativo la definizione delle varie funzioni
