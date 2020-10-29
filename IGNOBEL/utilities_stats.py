@@ -694,7 +694,9 @@ def fortuna_evo(Results, Teams, Tot_per_round,  title='Indice Fortuna Evolution'
 
     giornate = Results['luca'].index
     gg = max(giornate)
-    fig = plt.figure(figsize=(gg*0.6,6))
+    ggfig = max(12,gg)
+    fig = plt.figure(figsize=(ggfig*0.6,6))
+    ax=fig.add_subplot(111)
 
     data = []
     for team in Teams.keys():
@@ -721,17 +723,17 @@ def fortuna_evo(Results, Teams, Tot_per_round,  title='Indice Fortuna Evolution'
         if diff > 0: sign='+'
         else: sign=''
         label = '%.1f (%s%.1f) | %s' % (score, sign, diff, team)
-        p = plt.plot(giornate, df['score'], color=color, ls='-', lw=2, label=label)
+        p = ax.plot(giornate, df['score'], color=color, ls='-', lw=2, label=label)
 
-    plt.xticks(np.arange(0,gg+1))
-    plt.grid(axis='x', linestyle='-', linewidth=5, alpha=0.2)
-    plt.grid(axis='y', alpha=0.2)
+    plt.xticks(np.arange(0,ggfig+1))
+    ax.grid(axis='x', linestyle='-', linewidth=5, alpha=0.2)
+    ax.grid(axis='y', alpha=0.2)
     plt.axhline(0, color='grey')
     plt.xlabel('Giornata')
     plt.ylabel(ylabel)
     plt.title(title)
 
-    plt.legend(loc="upper left")
+    plt.legend(loc="upper right")
     plt.show()
     
     
