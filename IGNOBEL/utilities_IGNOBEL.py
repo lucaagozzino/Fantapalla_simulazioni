@@ -291,8 +291,11 @@ def scarica_stats(stagione ='2020-21'):
 
 
 
-def stats_by_team(stagione ='2020-21', dic = dict_names):
-    Rose = rose()
+def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False):
+    if primavera:
+        Rose = rose() #change the function that fetches the list of players in order to include also the primavera players
+    else:
+        Rose = rose()
     stats = scarica_stats(stagione)
     nomi = list(stats.Nome)
     stats.index = nomi
