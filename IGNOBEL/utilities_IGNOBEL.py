@@ -307,6 +307,13 @@ def scarica_stats(stagione ='2020-21'):
     data.index = list(range(len(data)))
     return data
 
+def scarica_quot(stagione ='2020-21'):
+    data = pd.read_excel('http://www.fantacalcio.it//Servizi/Excel.ashx?type=0&r=1&t=1604293589000',skiprows = [0])
+    #data = data[data.Nome != 'Nome']
+    #data = data.dropna()
+    data.index = list(range(len(data)))
+    return data
+
 def rose_complete():
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
     
@@ -346,7 +353,21 @@ def rose_complete():
     return df
 
 
-def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False):
+def personal_info(Name, database):
+    gioc = database[database.Nome == Name]
+    name = Name.replace(' ','-').lower()
+    Id = str(list(gioc['Id'])[0])
+    team = list(gioc['Squadra'])[0].lower()
+    link = 'https://www.fantacalcio.it/squadre/'+team+'/'+name+'/'+Id
+    driver.get(link)
+    string = driver.find_element_by_xpath("/html/body/div[7]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[3]")
+    classe = string.text[16:26]
+    eta = string.text[28:30]
+    
+    return classe, eta
+
+
+def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False, personal = False):
     if primavera:
         Rose = rose_complete() 
     else:
@@ -354,6 +375,11 @@ def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False):
     stats = scarica_stats(stagione)
     nomi = list(stats.Nome)
     stats.index = nomi
+    
+    quot = scarica_quot()
+    nomi_Q = list(quot.Nome)
+    quot.index = nomi_Q
+    
     stats_teams = []
     for team, df in Rose.items():
         for name in df:
@@ -361,8 +387,13 @@ def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False):
                 continue
             elif len(name)<2:
                 continue
-            temp = list(stats.T[name]) + [team, dic[team]]
-            col = list(stats.columns) + ['Nome Squadra', 'Allenatore']
+            if personal:
+                classe, eta = personal_info(name, stats)
+                temp = list(stats.T[name]) + list(quot.T[name][4:7]) + [classe, eta] +[team, dic[team]]
+                col = list(stats.columns) + list(quot.columns)[4:7] + ['Classe', 'Eta\''] +['Nome Squadra', 'Allenatore']
+            else:
+                temp = list(stats.T[name]) + list(quot.T[name][4:7]) + [team, dic[team]]
+                col = list(stats.columns) + list(quot.columns)[4:7] +['Nome Squadra', 'Allenatore']
             stats_teams.append(temp)
     return pd.DataFrame(data= stats_teams, columns = col)
 
