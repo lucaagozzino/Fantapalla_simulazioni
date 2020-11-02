@@ -9,6 +9,17 @@ options.headless = True
 options.add_argument("--window-size=1920,10200") #this is important, to tell it how much of the webpage to import
 driver = webdriver.Chrome(options=options, executable_path=r'/usr/local/bin/chromedriver')
 
+dict_names={
+    'AS 800A': 'enzo',
+    'PDG 1908': 'pietro',
+    'IGNORANZA EVERYWHERE': 'mario',
+    'SOROS FC': 'musci8',
+    'MAINZ NA GIOIA': 'franky',
+    'PALLA PAZZA': 'nanni',
+    'I DISEREDATI': 'emiliano',
+    'XYZ': 'luca'
+    }
+
 #rivedere i vari xpath, nel caso in cui la struttura del sito e' diversa
 
 def formazioni(competizione = 'campionato'):
@@ -242,17 +253,7 @@ def storico_IG(giornata, dict_names, path = "Dati_storici/"):
             test_dict[dict_names[team]][i] = [i, content[0], float(content[1]), content[2], content[3]+2*content[4], content[5], content[6], content[7], dict_names[team]]
     return(test_dict)
 
-def storico_individuale(nome, giornata):
-    dict_names={
-    'AS 800A': 'enzo',
-    'PDG 1908': 'pietro',
-    'IGNORANZA EVERYWHERE': 'mario',
-    'SOROS FC': 'musci8',
-    'MAINZ NA GIOIA': 'franky',
-    'PALLA PAZZA': 'nanni',
-    'I DISEREDATI': 'emiliano',
-    'XYZ': 'luca'
-    }
+def storico_individuale(nome, giornata, dict_names = dict_names):
 
     test_dict = storico_IG(giornata, dict_names)
     
@@ -279,3 +280,29 @@ def aggiorna_database(giornata):
         df = storico_individuale(name, giornata)
         df.to_pickle("Dati_individuali/"+ name +".pkl")
     print("Dati aggiornati fino alla "+str(giornata)+" giornata")
+    
+
+def scarica_stats(stagione ='2020-21'):
+    data = pd.read_excel('http://www.fantacalcio.it/Servizi/Excel.ashx?type=2&r=1&t=1604259046000&s='+stagione,skiprows = [0])
+    data = data[data.Nome != 'Nome']
+    data = data.dropna()
+    data.index = list(range(len(data)))
+    return data
+
+
+
+def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False):
+    if primavera:
+        Rose = rose() #change the function that fetches the list of players in order to include also the primavera players
+    else:
+        Rose = rose()
+    stats = scarica_stats(stagione)
+    nomi = list(stats.Nome)
+    stats.index = nomi
+    stats_teams = []
+    for team, df in Rose.items():
+        for name in df:
+            temp = list(stats.T[name]) + [team, dic[team]]
+            col = list(stats.columns) + ['Nome Squadra', 'Allenatore']
+            stats_teams.append(temp)
+    return pd.DataFrame(data= stats_teams, columns = col)
