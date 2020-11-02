@@ -1,8 +1,18 @@
+from __future__ import print_function
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import pandas as pd
 from selenium.common.exceptions import NoSuchElementException   
 import progressbar
+
+
+import pickle
+import os.path
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
 
 options = Options()
 options.headless = True
@@ -17,7 +27,15 @@ dict_names={
     'MAINZ NA GIOIA': 'franky',
     'PALLA PAZZA': 'nanni',
     'I DISEREDATI': 'emiliano',
-    'XYZ': 'luca'
+    'XYZ': 'luca',
+    'AS 800A - PRIMAVERA': 'enzo',
+    'PDG 1908 - PRIMAVERA': 'pietro',
+    'IGNORANZA EVERYWHERE - PRIMAVERA': 'mario',
+    'SOROS FC - PRIMAVERA': 'musci8',
+    'MAINZ NA GIOIA - PRIMAVERA': 'franky',
+    'PALLA PAZZA - PRIMAVERA': 'nanni',
+    'I DISEREDATI - PRIMAVERA': 'emiliano',
+    'XYZ - PRIMAVERA': 'luca'
     }
 
 #rivedere i vari xpath, nel caso in cui la struttura del sito e' diversa
@@ -289,11 +307,48 @@ def scarica_stats(stagione ='2020-21'):
     data.index = list(range(len(data)))
     return data
 
+def rose_complete():
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+    
+    # The ID and range of a sample spreadsheet.
+    sheetId = '1uxUNBIjPzIJznquQ1rtHEiWE8iq_TNsJ3m9x8AAO0n0'
+    SAMPLE_SPREADSHEET_ID_input = sheetId #'1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
+    SAMPLE_RANGE_NAME = 'ROSE!A1:P26'
+    
+    #global values_input, service
+    creds = None
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'my_json_file.json', SCOPES) # here enter the name of your downloaded JSON file
+            creds = flow.run_local_server(port=0)
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    service = build('sheets', 'v4', credentials=creds)
+
+    # Call the Sheets API
+    sheet = service.spreadsheets()
+    result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
+                                range=SAMPLE_RANGE_NAME).execute()
+    values_input = result_input.get('values', [])
+
+    if not values_input and not values_expansion:
+        print('No data found.')
+        
+    df=pd.DataFrame(values_input[1:], columns=values_input[0])
+    
+    return df
 
 
 def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False):
     if primavera:
-        Rose = rose() #change the function that fetches the list of players in order to include also the primavera players
+        Rose = rose_complete() 
     else:
         Rose = rose()
     stats = scarica_stats(stagione)
@@ -302,7 +357,13 @@ def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False):
     stats_teams = []
     for team, df in Rose.items():
         for name in df:
+            if name is None:
+                continue
+            elif len(name)<2:
+                continue
             temp = list(stats.T[name]) + [team, dic[team]]
             col = list(stats.columns) + ['Nome Squadra', 'Allenatore']
             stats_teams.append(temp)
     return pd.DataFrame(data= stats_teams, columns = col)
+
+
