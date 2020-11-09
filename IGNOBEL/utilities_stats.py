@@ -178,18 +178,6 @@ def fattore_distacco(Total):
     dist_rel = (Total['distacco'] - dist_med) / dist_std
     return -dist_rel-pf_rel
 
-#def calc_fortuna(df): ##THIS HAS BEEN MULTIPLY DEFINED, SO I'LL COMMENT THIS
-#    keys = ('f_pos', 'f_distacco', 'f_GS', 'f_close_games')
-#    scaling = (0.5, 1, 1, 0.5)
-#    cols = ['dodgerblue', 'purple', 'r', 'gold']
-#    factors = []
-#    df['IndiceFortuna'] = [0,0,0,0,0,0,0,0]
-    ### build fortuna
-#    for col,scale in zip(keys,scaling):
-#        factors.append(df[col]*scale)
-#        df['IndiceFortuna'] = df['IndiceFortuna'] + df[col]*scale
-#    return df
-
 ### Fill dataframe per partita #############################
 
 def fill_dataframe_partita(Results_0, giornate, parameters, goal_marks, Teams, Print = False):
@@ -542,22 +530,28 @@ def get_cumulated_array(data, **kwargs):
 
 
 def calc_fortuna(df, giornate, tot_giornate):
+    '''
     keys = ('f_pos', 'f_distacco', 'f_GS', 'f_close_games', 'f_stolen_games', 'f_unlucky_opponent')
     scaling = (0.5, 1, 1, 0.5, 0.25*tot_giornate/giornate, 0.25*tot_giornate/giornate)
-    #scaling = (10.5, 1, 1, 0.5, 0.25, 0.25)
-
     cols = ['dodgerblue', 'purple', 'r', 'gold', 'c', 'lime']
-    #keys = ('f_distacco', 'f_GS', 'f_closegames')
-    #scaling = (1, 1, 0.5)
-    #cols = ['dodgerblue', 'purple', 'gold']
-    
     factors = []
     df['IndiceFortuna'] = [0,0,0,0,0,0,0,0]
     ### build fortuna
     for col,scale in zip(keys,scaling):
         factors.append(df[col]*scale)
         df['IndiceFortuna'] = df['IndiceFortuna'] + df[col]*scale
-    #print(len(factors))
+    return df, factors
+    '''
+    
+    keys = ('f_pos', 'f_distacco', 'f_GS', 'f_close_games')
+    scaling = (0.5, 1, 1, 0.5)
+    cols = ['dodgerblue', 'purple', 'r', 'gold']
+    factors = []
+    df['IndiceFortuna'] = [0,0,0,0,0,0,0,0]
+   ### build fortuna
+    for col,scale in zip(keys,scaling):
+        factors.append(df[col]*scale)
+        df['IndiceFortuna'] = df['IndiceFortuna'] + df[col]*scale
     return df, factors
 
 
