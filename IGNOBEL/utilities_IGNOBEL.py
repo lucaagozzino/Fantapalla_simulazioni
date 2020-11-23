@@ -14,6 +14,11 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 
+from webdriver_manager.chrome import ChromeDriverManager
+
+#driver = webdriver.Chrome(ChromeDriverManager().install())
+
+
 options = Options()
 options.headless = True
 options.add_argument("--window-size=1920,10200") #this is important, to tell it how much of the webpage to import
