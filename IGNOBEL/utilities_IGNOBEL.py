@@ -368,8 +368,10 @@ def personal_info(Name, database):
     string = driver.find_element_by_xpath("/html/body/div[7]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[3]")
     classe = string.text[16:26]
     eta = string.text[28:30]
+    full_name = driver.find_element_by_xpath("/html/body/div[7]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[1]").text
+    nationality = driver.find_element_by_xpath("/html/body/div[7]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[2]").text
     
-    return classe, eta
+    return classe, eta, full_name[5:], nationality[12:]
 
 
 def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False, personal = False):
@@ -393,13 +395,40 @@ def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False, pers
             elif len(name)<2:
                 continue
             if personal:
-                classe, eta = personal_info(name, stats)
-                temp = list(stats.T[name]) + list(quot.T[name][4:7]) + [classe, eta] +[team, dic[team]]
-                col = list(stats.columns) + list(quot.columns)[4:7] + ['Classe', 'Eta\''] +['Nome Squadra', 'Allenatore']
+                classe, eta, nome_completo, nazione = personal_info(name, stats)
+                temp = list(stats.T[name]) + list(quot.T[name][4:7]) + [classe, eta, nome_completo, nazione] +[team, dic[team]]
+                col = list(stats.columns) + list(quot.columns)[4:7] + ['Classe', 'Eta\'', 'Nome Completo', 'Nazionalit\'a'] +['Nome Squadra', 'Allenatore']
             else:
                 temp = list(stats.T[name]) + list(quot.T[name][4:7]) + [team, dic[team]]
                 col = list(stats.columns) + list(quot.columns)[4:7] +['Nome Squadra', 'Allenatore']
             stats_teams.append(temp)
     return pd.DataFrame(data= stats_teams, columns = col)
 
+def stats_by_team_full(stagione ='2020-21', dic = dict_names, primavera = False):
+    if primavera:
+        Rose = rose_complete() 
+    else:
+        Rose = rose()
+    stats = scarica_stats(stagione)
+    nomi = list(stats.Nome)
+    stats.index = nomi
+    
+    quot = scarica_quot()
+    nomi_Q = list(quot.Nome)
+    quot.index = nomi_Q
+    
+    stats_teams = []
+    for name in nomi_Q:
+        for team, squad in Rose.items():
+            team_name = 'svincolato'
+            allenatore = None
+            if name in list(squad):
+                team_name = team
+                allenatore = dic[team_name]
+                break #might not be necessary
+        classe, eta, nome_completo, nazione = personal_info(name, stats)
+        temp = list(stats.T[name]) + list(quot.T[name][4:7]) + [classe, eta, nome_completo, nazione] +[team_name, allenatore]
+        col = list(stats.columns) + list(quot.columns)[4:7] + ['Classe', 'Eta\'', 'Nome Completo', 'Nazionalit\'a'] +['Nome Squadra', 'Allenatore']
+        stats_teams.append(temp)
+    return pd.DataFrame(data= stats_teams, columns = col)
 
