@@ -2,6 +2,7 @@
 *.xlsx
 .DS_Store
 Untitled.ipynb
+credential.json
 
 
 # Byte-compiled / optimized / DLL files
