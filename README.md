@@ -1,5 +1,8 @@
 # Fantapalla_Forever_database
 
+## A fun, leisure project of Fantasy Football
+
+
 La repo e' suddivisa nelle seguenti cartelle:
 
 - Prototyping: contiene notebook temporanei utilizzati per la fase di costruzione degli algoritmi
