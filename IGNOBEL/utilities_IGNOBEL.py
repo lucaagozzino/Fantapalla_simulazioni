@@ -306,7 +306,7 @@ def aggiorna_database(giornata):
     
 
 def scarica_stats(stagione ='2020-21'):
-    data = pd.read_excel('http://www.fantacalcio.it/Servizi/Excel.ashx?type=2&r=1&t=1604259046000&s='+stagione,skiprows = [0])
+    data = pd.read_excel('http://www.fantacalcio.it/Servizi/Excel.ashx?type=2&r=1&t=1608803566000&s='+stagione,skiprows = [0])
     data = data[data.Nome != 'Nome']
     data = data.dropna()
     data.index = list(range(len(data)))
