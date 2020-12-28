@@ -304,19 +304,34 @@ def aggiorna_database(giornata):
         df.to_pickle("Dati_individuali/"+ name +".pkl")
     print("Dati aggiornati fino alla "+str(giornata)+" giornata")
     
+import time
 
 def scarica_stats(stagione ='2020-21'):
-    data = pd.read_excel('http://www.fantacalcio.it/Servizi/Excel.ashx?type=2&r=1&t=1608803566000&s='+stagione,skiprows = [0])
-    data = data[data.Nome != 'Nome']
-    data = data.dropna()
-    data.index = list(range(len(data)))
+    driver.get('https://www.fantacalcio.it/statistiche-serie-a')
+    button = driver.find_element_by_id("toexcel")
+    driver.execute_script("arguments[0].click();", button)
+    time.sleep(5)
+    for file in os.listdir('./'):
+        if 'Statistiche_Fantacalcio' in file:
+            data = pd.read_excel(file,skiprows=[0])
+            data = data[data.Nome != 'Nome']
+            data = data.dropna()
+            data.index = list(range(len(data)))
+            os.remove(file)
+            
+    
     return data
 
 def scarica_quot(stagione ='2020-21'):
-    data = pd.read_excel('http://www.fantacalcio.it//Servizi/Excel.ashx?type=0&r=1&t=1604293589000',skiprows = [0])
-    #data = data[data.Nome != 'Nome']
-    #data = data.dropna()
-    data.index = list(range(len(data)))
+    driver.get('https://www.fantacalcio.it/quotazioni-fantacalcio')
+    button = driver.find_element_by_id("toexcel")
+    driver.execute_script("arguments[0].click();", button)
+    time.sleep(5)
+    for file in os.listdir('./'):
+        if 'Quotazioni_Fantacalcio' in file:
+            data = pd.read_excel(file,skiprows=[0])
+            data.index = list(range(len(data)))
+            os.remove(file)
     return data
 
 def rose_complete():
