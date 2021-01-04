@@ -878,7 +878,7 @@ def premio_plot(Results, giornate, Teams, Logos, premio, Print = False):
     
     
     plt.legend()
-    plt.savefig('plot_'+premio+'.jpg')
+    plt.savefig('Plots/plot_'+premio+'.jpg')
     plt.show()
 
     
