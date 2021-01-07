@@ -668,9 +668,63 @@ def C_factor_logos(Total, giornate, Teams, tot_giornate, Logos):
     #for i, team in enumerate(Teams.keys()):
     #    offset_image(i, team, ax)
 
+    plt.savefig('Plots/C_fact_Total.png')
+    #plt.show()
 
-    plt.show()
+def C_factor_logos_2(Total, giornate, Teams, tot_giornate, Logos):
     
+    Total, __factors__ = calc_fortuna(Total, giornate, tot_giornate)
+    
+    df = Total
+    df = df.sort_values('IndiceFortuna', ascending=True)
+    
+    fig = plt.figure(figsize=(6,8))
+    ax=fig.add_subplot(111)
+
+    plt.grid(which='major', axis='y', ls='-', alpha=0.25)
+    ax.tick_params(left=False)
+    #plt.axhline(y=0, xmin=-100, xmax=100, color='grey', ls='-')
+
+    max_f = max(df['IndiceFortuna'])
+    min_f = np.min(df['IndiceFortuna'])
+    colors = get_team_colors(Teams)
+
+    for team in df['Team']:
+        df_ = df[df.Team == team]
+        ax.barh(team.upper(), df_['IndiceFortuna'], color=Teams[team][1], lw=0, alpha=0.99, label='')
+
+    #for i, f in enumerate(list(np.round(Total['IndiceFortuna'],decimals=1))):
+        f = df_['IndiceFortuna'].iat[0]
+        if f<0: 
+            va = 'right'
+            offset = -0.1
+            color = 'r'
+        else: 
+            va = 'left'
+            offset = 0.1
+            color = 'tab:green'
+        plt.annotate('%.1f' % f, (f+offset, team.upper()), color=color, verticalalignment='center', horizontalalignment=va, weight='bold')
+        offset_image(Logos,-5*offset,team.upper(), team, ax, zoom=0.125)
+                    
+    plt.xlim(min_f-2, max_f+2)
+    plt.xlabel('Indice Fortuna')
+    title = 'C FACTOR | ' + str(giornate) + ' Giornate'
+    #plt.title(title, fontsize=20, )
+    plt.grid(axis='both', lw=0)
+
+    ax.set_title('C FACTOR', fontweight='bold', loc='left')
+    ax.set_title('Giornata: ' + str(giornate), fontweight='100', loc='right')
+
+
+    ax.tick_params(axis='y', which='major')
+    #for i, team in enumerate(Teams.keys()):
+    #    offset_image(i, team, ax)
+
+
+    #plt.show()
+
+    plt.savefig('Plots/C_fact_Total.png')
+    #plt.show()
 
 def partial_totals(Results, giornate, tot_giornate, goal_marks):
     #--- build partial Total entries
@@ -727,8 +781,9 @@ def fortuna_evo(Results, Teams, Tot_per_round,  title='Indice Fortuna Evolution'
     plt.ylabel(ylabel)
     plt.title(title)
 
-    plt.legend(loc="upper right")
-    plt.show()
+    plt.legend(loc="best")
+    plt.savefig('Plots/C_fact_Historic.png')
+    #plt.show()
     
     
     
@@ -878,7 +933,7 @@ def premio_plot(Results, giornate, Teams, Logos, premio, Print = False):
     
     
     plt.legend()
-    plt.savefig('Plots/plot_'+premio+'.jpg')
-    plt.show()
+    plt.savefig('Plots/plot_'+premio+'.png')
+    #plt.show()
 
     
