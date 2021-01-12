@@ -772,6 +772,7 @@ def fortuna_evo(Results, Teams, Tot_per_round,  title='Indice Fortuna Evolution'
         else: sign=''
         label = '%.1f (%s%.1f) | %s' % (score, sign, diff, team)
         p = ax.plot(giornate, df['score'], color=color, ls='-', lw=2, label=label)
+        
 
     plt.xticks(np.arange(0,ggfig+1))
     ax.grid(axis='x', linestyle='-', linewidth=5, alpha=0.2)
@@ -846,8 +847,12 @@ def premio_plot(Results, giornate, Teams, Logos, premio, Print = False):
                 
         data.append(df)
     data = sorted(data,key=lambda x:x['score'].unique().min(axis=0), reverse=True)
-
+    
+    out = []
     for df in data:
+        
+        
+        
         team = df['Team'].unique()[0]
         color = Teams[team][1]
         df['cumsum'] = np.cumsum(df[par])
@@ -868,7 +873,13 @@ def premio_plot(Results, giornate, Teams, Logos, premio, Print = False):
         ax.scatter(gior, marks, edgecolor=color, facecolor=color, s=300, label='')
         for x,y,text in zip(gior,marks,dd[par]):
             ax.text(x, y,text, horizontalalignment='center', verticalalignment='center', color='white', fontsize=fs)
-
+        
+        dic = {}
+        dic['team'] = team
+        dic['points'] = score
+        dic['points_last'] = diff
+        out.append(dic)
+        
     plt.xticks(np.arange(0,gg+1))
     ax.grid(axis='x', linestyle='-', linewidth=5, alpha=0.2)
     ax.set_xlabel('Giornata')
@@ -935,5 +946,6 @@ def premio_plot(Results, giornate, Teams, Logos, premio, Print = False):
     plt.legend()
     plt.savefig('Plots/plot_'+premio+'.png')
     #plt.show()
+    return out
 
     
