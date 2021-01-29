@@ -75,7 +75,7 @@ def storico_individuale(nome, giornata):
 
 ### Init dataframes #########################################################
 
-def set_par():
+def set_par(fasce = 2):
 
     Teams = {'luca' : ['XYZ', 'darkblue'],
              'franky' : ['Mainz Na Gioia', 'r'],
@@ -129,7 +129,9 @@ def set_par():
     }
 
     # Steps of scored goals
-    goal_marks=np.array([66,68,70,72,74,76,78,80,82,84,86,88,90])
+    #goal_marks=np.array([66,68,70,72,74,76,78,80,82,84,86,88,90])
+    
+    goal_marks = np.arange(66,100,fasce)
     
     return Teams, Logos, parameters, Results, goal_marks
 
