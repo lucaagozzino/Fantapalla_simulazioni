@@ -181,7 +181,57 @@ def fattore_distacco(Total):
     return -dist_rel-pf_rel
 
 ### Fill dataframe per partita #############################
+#############################################################
+# Crea calendario con dictionary del rivale per ciscauna squadra, giornata per giornata
+#############################################################
+def make_calendar_array(data_path = '../IGNOBEL/Dati_storici/'):
+    giornate = current_matchday()
+    # dictionary converting team names into owner names
+    team2owners = {
+        'XYZ': 'luca',
+        'MAINZ NA GIOIA': 'franky',
+        'I DISEREDATI': 'emiliano',
+        'PALLA PAZZA' : 'nanni',
+        'AS 800A': 'enzo',
+        'PDG 1908': 'pietro',
+        'SOROS FC': 'musci8',
+        'IGNORANZA EVERYWHERE':'mario',
+    }
 
+    calendar = [] #array con accoppiamenti squadre giornata per giornata
+    rivals = {} #dictionary con accoppiamenti singola giornata
+    # Rimepi array calendar con dictionary accoppiamento per ogni owner
+    for giornata in range(1,giornate+1):
+        # read Dati storici
+        df = pd.read_pickle(data_path + 'Giornata_%d.pkl' % giornata)
+        teams = df.columns
+        # accoppia teams
+        for i, team in enumerate(teams):
+            owner = team2owners[team]
+            if i%2 == 0:
+                rival_owner = team2owners[teams[i+1]]
+            else:
+                rival_owner = team2owners[teams[i-1]]
+            rivals[owner] = rival_owner # dict accoppiamenti di giornata
+        # array di accoppiamenti per giornata
+        calendar.append(rivals)
+        rivals = {}
+    
+    return calendar
+
+#############################################################
+# Aggiungi colonna avversario ai dataframes in Results
+#############################################################
+def add_avversario_column_to_Results(calendar, Results):
+    giornate = current_matchday()
+    for owner in Results.keys():
+        avversari_array = []
+        for giornata in range(0,giornate):
+            avversario = calendar[giornata][owner]
+            avversari_array.append(avversario)
+        Results[owner]['avversario'] = avversari_array
+    return Results
+        
 def fill_dataframe_partita(Results_0, giornate, parameters, goal_marks, Teams, Print = False):
     Results = Results_0
     for team, df in Results.items():
@@ -202,7 +252,11 @@ def fill_dataframe_partita(Results_0, giornate, parameters, goal_marks, Teams, P
         Results[team]['GS'] = Results[team].apply(lambda x: get_goal(x['punti_subiti'], goal_marks), axis=1)
         Results[team]['esito'] = Results[team].apply(lambda x: esito(x['GF'],x['GS']), axis=1)
         Results[team]['pti'] = Results[team].apply(lambda x: punti(x['esito']), axis=1)
-        Results[team] = Results[team].assign(Team=team)    
+        Results[team] = Results[team].assign(Team=team)   
+        
+        # Add avversario column to each team's dataframe
+        calendar = make_calendar_array()
+        Results = add_avversario_column_to_Results(calendar = calendar, Results = Results)
 
         if Print:
             print('###', team, '|', Teams[team], '###')
