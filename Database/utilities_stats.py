@@ -416,6 +416,9 @@ def make_Total_df(Results, giornate, goal_marks, verbose=False):
     Total['f_close_games'] = close_games(Results, giornate)
     Total['f_stolen_games'] = exact_fp(Results, giornate, goal_marks)
     Total['f_unlucky_opponent'] = opponent_almost_scored(Results, giornate, goal_marks)
+    
+    # dirty hack
+    Total['Team'] = Total['avversario']
     return Total
 
 
