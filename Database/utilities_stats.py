@@ -285,7 +285,7 @@ def cumulative_data(Results, giornate, Print = True):
     return pf_med, pf_std, ps_med, ps_std, gf_med, gf_std
 
 
-### Total values dataframe #######################
+### values dataframe #######################
 def close_games(Results, giornate, verbose=False):
     data = Results
     '''Compute close games per team and add factor to Total dataframe'''
