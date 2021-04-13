@@ -841,7 +841,7 @@ def fortuna_evo(Results, Teams, Tot_per_round,  title='Indice Fortuna Evolution'
     plt.ylabel(ylabel)
     plt.title(title)
 
-    plt.legend(loc="best")
+    plt.legend(loc="left")
     plt.savefig('Plots/C_fact_Historic.png')
     #plt.show()
     
