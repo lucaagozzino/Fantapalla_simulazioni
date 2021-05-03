@@ -94,7 +94,8 @@ def infortunati(giornata):
 
     driver.execute_script("arguments[0].click();", button)
 
-    test = driver.find_elements_by_xpath("/html/body/div[7]/div[5]/main/div/div/div/div[1]/div[2]/div[5]/div[@class]/div/div/div[2]/div/div[1]/p[@class]/span")
+    test = driver.find_elements_by_xpath("/html/body/div[6]/div[5]/main/div/div/div/div[1]/div[2]/div[3]/div[@class]/div/div/div[2]/div/div[1]/p[@class]/span")
+                                        
     all_inf = []
     for pl in test:
         all_inf.append(pl.text)
@@ -376,15 +377,17 @@ def rose_complete():
 def personal_info(Name, database):
     gioc = database[database.Nome == Name]
     name = Name.replace(' ','-').lower()
+    name = name.replace('.','').lower()
     Id = str(list(gioc['Id'])[0])
     team = list(gioc['Squadra'])[0].lower()
     link = 'https://www.fantacalcio.it/squadre/'+team+'/'+name+'/'+Id
+    #print(link)
     driver.get(link)
-    string = driver.find_element_by_xpath("/html/body/div[7]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[3]")
+    string = driver.find_element_by_xpath("/html/body/div[6]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[3]")
     classe = string.text[16:26]
     eta = string.text[28:30]
-    full_name = driver.find_element_by_xpath("/html/body/div[7]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[1]").text
-    nationality = driver.find_element_by_xpath("/html/body/div[7]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[2]").text
+    full_name = driver.find_element_by_xpath("/html/body/div[6]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[1]").text
+    nationality = driver.find_element_by_xpath("/html/body/div[6]/div[5]/main/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div/ul[1]/li[2]").text
     
     return classe, eta, full_name[5:], nationality[12:]
 
