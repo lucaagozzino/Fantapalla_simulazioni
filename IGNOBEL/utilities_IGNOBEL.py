@@ -13,8 +13,29 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+from pymongo import MongoClient
+from pprint import pprint
+import pymongo
+
 
 from webdriver_manager.chrome import ChromeDriverManager
+import json
+with open('credential.json','r') as f:
+    cred = json.load(f)
+    
+
+#creates the variables needed to manage the database
+cluster = MongoClient(cred['cred'])
+# choosing database
+db = cluster["Game"]
+# choosing collection
+collection = db["Players"]
+collection_man = db['Managers']
+collection_tr = db['Transfers']
+
+collection_temp = db["tempPlayers"]
+collection_man_temp = db['tempManagers']
+collection_tr_temp = db['tempTransfers']
 
 #driver = webdriver.Chrome(ChromeDriverManager().install())
 
@@ -374,8 +395,70 @@ def rose_complete():
     return df
 
 
-def personal_info(Name, database):
-    gioc = database[database.Nome == Name]
+
+def rose_MDB():
+    df0 = pd.DataFrame()
+    for manager_dict in collection_man.find():
+        man = manager_dict['owner']
+        sq = []
+        team_name = collection_man.find_one({'owner': man})['team_name']
+        for pl in collection.find({'info.current_team.owner': man}):
+            sq.append(pl['name'])
+        df = pd.DataFrame(data = {team_name:sq})
+        df0 = pd.concat([df0,df],axis=1)
+    return df0
+
+
+
+def stats_by_team_NO_INFO(stagione ='2020-21', dic = dict_names, primavera = False):
+    if primavera:
+        Rose = rose_MDB() 
+    else:
+        Rose = rose()
+    stats = scarica_stats(stagione)
+    nomi = list(stats.Nome)
+    
+    stats.index = nomi
+    
+    quot = scarica_quot()
+    nomi_Q = list(quot.Nome)
+    quot.index = nomi_Q
+    ids = list(quot.Id)
+    
+    stats_teams = []
+    for name in nomi_Q:
+        for team, squad in Rose.items():
+            team_name = 'svincolato'
+            allenatore = None
+            if name in list(squad):
+                
+                team_name = team
+                allenatore = dic[team_name]
+                break #might not be necessary
+        
+        temp = list(stats.T[name]) + list(quot.T[name][4:7])  +[team_name, allenatore]
+        col = list(stats.columns) + list(quot.columns)[4:7] +['Nome Squadra', 'Allenatore']
+        stats_teams.append(temp)
+    return pd.DataFrame(data= stats_teams, columns = col, index = ids)
+
+def find_missing_players(collection, database):
+    missing_pl = []
+    all_pl = list(database.Id)
+    our_pl = []
+    posts = collection.find()
+    for pl in posts:
+        our_pl.append(pl['_id'])
+    our_pl
+    for pl in all_pl:
+        if pl in our_pl:
+            continue
+        else:
+            missing_pl.append(pl)
+    return missing_pl
+
+def personal_info(Id, database):
+    gioc = database[database.Id == Id]
+    Name = list(gioc.Nome)[0]
     name = Name.replace(' ','-').lower()
     name = name.replace('.','').lower()
     Id = str(list(gioc['Id'])[0])
@@ -392,61 +475,16 @@ def personal_info(Name, database):
     return classe, eta, full_name[5:], nationality[12:]
 
 
-def stats_by_team(stagione ='2020-21', dic = dict_names, primavera = False, personal = False):
-    if primavera:
-        Rose = rose_complete() 
-    else:
-        Rose = rose()
-    stats = scarica_stats(stagione)
-    nomi = list(stats.Nome)
-    stats.index = nomi
-    
-    quot = scarica_quot()
-    nomi_Q = list(quot.Nome)
-    quot.index = nomi_Q
-    
-    stats_teams = []
-    for team, df in Rose.items():
-        for name in df:
-            if name is None:
-                continue
-            elif len(name)<2:
-                continue
-            if personal:
-                classe, eta, nome_completo, nazione = personal_info(name, stats)
-                temp = list(stats.T[name]) + list(quot.T[name][4:7]) + [classe, eta, nome_completo, nazione] +[team, dic[team]]
-                col = list(stats.columns) + list(quot.columns)[4:7] + ['Classe', 'Eta\'', 'Nome Completo', 'Nazionalit\'a'] +['Nome Squadra', 'Allenatore']
-            else:
-                temp = list(stats.T[name]) + list(quot.T[name][4:7]) + [team, dic[team]]
-                col = list(stats.columns) + list(quot.columns)[4:7] +['Nome Squadra', 'Allenatore']
-            stats_teams.append(temp)
-    return pd.DataFrame(data= stats_teams, columns = col)
-
-def stats_by_team_full(stagione ='2020-21', dic = dict_names, primavera = False):
-    if primavera:
-        Rose = rose_complete() 
-    else:
-        Rose = rose()
-    stats = scarica_stats(stagione)
-    nomi = list(stats.Nome)
-    stats.index = nomi
-    
-    quot = scarica_quot()
-    nomi_Q = list(quot.Nome)
-    quot.index = nomi_Q
-    
-    stats_teams = []
-    for name in nomi_Q:
-        for team, squad in Rose.items():
-            team_name = 'svincolato'
-            allenatore = None
-            if name in list(squad):
-                team_name = team
-                allenatore = dic[team_name]
-                break #might not be necessary
-        classe, eta, nome_completo, nazione = personal_info(name, stats)
-        temp = list(stats.T[name]) + list(quot.T[name][4:7]) + [classe, eta, nome_completo, nazione] +[team_name, allenatore]
-        col = list(stats.columns) + list(quot.columns)[4:7] + ['Classe', 'Eta\'', 'Nome Completo', 'Nazionalit\'a'] +['Nome Squadra', 'Allenatore']
-        stats_teams.append(temp)
-    return pd.DataFrame(data= stats_teams, columns = col)
-
+def info_missing_players(collection, database):
+    missing_ids = find_missing_players(collection, database)
+    all_pl = []
+    for idx in missing_ids:
+        infos = personal_info(idx, database)
+        dic = {}
+        dic['Id'] = idx
+        dic['Classe'] = infos[0]
+        dic['Eta\''] = infos[1]
+        dic['Nome Completo'] = infos[2]
+        dic['Nazionalita\''] = infos[3]
+        all_pl.append(dic)
+    return pd.DataFrame(all_pl, index = missing_ids)
