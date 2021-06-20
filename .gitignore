@@ -1,5 +1,6 @@
 *.csv
 *.xlsx
+*.json
 .DS_Store
 Untitled.ipynb
 credential.json

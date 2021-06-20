@@ -1,4 +1,6 @@
 credential.json
+credentials.json
+
 
 # C extensions
 *.so
